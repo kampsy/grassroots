@@ -63,9 +63,11 @@ const Layout = () => {
               </Flex>
             </Box>
             <Box w={'100%'}>
-              <Button w={'100%'} leftIcon={<HiHome />} colorScheme='blue' variant={'outline'}>
-                Home
-              </Button>
+              <Link href='/'>
+                <Button w={'100%'} leftIcon={<HiHome />} colorScheme='blue' variant={'outline'}>
+                  Home
+                </Button>
+              </Link>
             </Box>
           </VStack>
         </Box>
