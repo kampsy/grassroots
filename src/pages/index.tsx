@@ -127,7 +127,7 @@ const AnimeTable = () => {
   return (
     <Box>
       <TableContainer bg='blackAlpha.50' p={2} border={1} borderColor='gray' rounded={'md'}>
-        <Table size={'sm'} variant='unstyled'>
+        <Table size={'sm'} variant='striped'>
           <Thead>
             <Tr>
               <Th>Title</Th>
