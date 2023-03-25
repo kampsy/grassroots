@@ -1,13 +1,20 @@
 import Head from 'next/head'
 import { Inter } from 'next/font/google'
+import { useState } from 'react'
 import {
   Grid, GridItem, Box, VStack, Container, Button, Flex, Avatar,
-  Text, SimpleGrid, ButtonGroup, Skeleton, SkeletonText
+  Text, SimpleGrid, ButtonGroup, Skeleton, SkeletonText, TableContainer,
+  Table, Thead, Tbody, Tr, Th, Td, Link
 } from '@chakra-ui/react'
-import { HiHome } from 'react-icons/hi'
+import { HiHome, HiChevronLeft, HiChevronRight } from 'react-icons/hi'
+import {
+  QueryClient,
+  QueryClientProvider,
+} from "react-query";
+import { GetAnime, Media } from '@/graphql-api'
 
 const inter = Inter({ subsets: ['latin'] })
-
+const queryClient = new QueryClient()
 
 const Home = () => {
   return (
@@ -19,7 +26,9 @@ const Home = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <Layout />
+        <QueryClientProvider client={queryClient}>
+          <Layout />
+        </QueryClientProvider>
       </main>
     </>
   )
@@ -64,7 +73,7 @@ const Layout = () => {
       <GridItem area={'main'} bg="white" textColor={'black'} overflow='scroll'>
         <Box p={4}>
           <Container maxW={'4xl'}>
-            <AnimeTableSkeleton />
+            <AnimeTable />
           </Container>
         </Box>
       </GridItem>
@@ -88,6 +97,61 @@ const AnimeTableSkeleton = () => {
           <ButtonGroup gap={2}>
             <Skeleton w={'90px'} h='40px' rounded={'md'} />
             <Skeleton w={'90px'} h='40px' rounded={'md'} />
+          </ButtonGroup>
+        </Flex>
+      </Box>
+    </Box>
+  )
+}
+
+const AnimeTable = () => {
+  const [page, setPage] = useState(1)
+  const { data, error, isLoading } = GetAnime(page);
+
+  if (error) return <h1>Something went wrong!</h1>;
+  if (isLoading) return <AnimeTableSkeleton />
+
+  const listAnime = data?.media?.map((media: Media) =>
+    <Tr key={media?.id}>
+      <Td>{media?.title?.native}</Td>
+      <Td>
+        <Link color={'blue.500'} href={media?.siteUrl}>
+          {media?.siteUrl}
+        </Link>
+      </Td>
+    </Tr>
+  )
+
+  return (
+    <Box>
+      <TableContainer bg='blackAlpha.50' p={2} border={1} borderColor='gray' rounded={'md'}>
+        <Table size={'sm'} variant='unstyled'>
+          <Thead>
+            <Tr>
+              <Th>Title</Th>
+              <Th>Link</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {listAnime}
+          </Tbody>
+        </Table>
+      </TableContainer>
+      <Box py={4}>
+        <Flex justifyContent={'end'}>
+          <ButtonGroup gap={2}>
+            <Button leftIcon={<HiChevronLeft />} colorScheme={page > 1 ? 'green' : 'gray'} variant={'ghost'} onClick={() => {
+              if (page > 1) {
+                setPage(page - 1);
+              }
+            }}>
+              Previus
+            </Button>
+            <Button colorScheme='blue' variant={'ghost'} rightIcon={<HiChevronRight />} onClick={() => {
+              setPage(page + 1)
+            }}>
+              Next
+            </Button>
           </ButtonGroup>
         </Flex>
       </Box>
